@@ -4,10 +4,10 @@ const GENESIS_HASH = '0000000000000000000000000000000000000000000000000000000000
 function sha256(data) {
   return crypto.createHash('sha256').update(data).digest('hex');
 }
-async function getLastBlock() {
+async function getLastBlock(){
   return dbGet('SELECT * FROM audit_chain ORDER BY block_index DESC LIMIT 1');
 }
-async function appendBlock(eventType, eventData) {
+async function appendBlock(eventType, eventData){
   const lastBlock = await getLastBlock();
   const blockIndex = lastBlock ? lastBlock.block_index + 1 : 0;
   const prevHash = lastBlock ? lastBlock.block_hash : GENESIS_HASH;
@@ -26,20 +26,20 @@ async function appendBlock(eventType, eventData) {
 async function verifyChain() {
   const blocks = await dbAll('SELECT * FROM audit_chain ORDER BY block_index ASC');
   if (blocks.length === 0) return { valid: true, totalBlocks: 0 };
-  for (let i = 0; i < blocks.length; i++) {
+  for (let i = 0; i < blocks.length; i++){
     const b = blocks[i];
     const expectedDataHash = sha256(b.event_data);
-    if (expectedDataHash !== b.data_hash) {
+    if (expectedDataHash !== b.data_hash){
       return { valid: false, brokenAtBlock: b.block_index, reason: 'Data hash mismatch' };
     }
     const expectedBlockHash = sha256(b.prev_hash + b.event_type + b.data_hash + b.timestamp);
-    if (expectedBlockHash !== b.block_hash) {
+    if (expectedBlockHash !== b.block_hash){
       return { valid: false, brokenAtBlock: b.block_index, reason: 'Block hash mismatch' };
     }
     if (i > 0 && b.prev_hash !== blocks[i - 1].block_hash) {
       return { valid: false, brokenAtBlock: b.block_index, reason: 'Chain linkage broken' };
     }
   }
-  return{ valid: true, totalBlocks: blocks.length };
+  return{ valid: true, totalBlocks: blocks.length};
 }
 module.exports = { appendBlock, verifyChain, sha256, GENESIS_HASH };
