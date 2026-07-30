@@ -13,7 +13,7 @@ const ROLES = [
 export default function LoginPage() {
     const { user, login } = useAuth();
     const [role, setRole] = useState('farmer');
-    const [form, setRole] = useState({ username: '', password: '' });
+    const [form, setForm] = useState({ username: '', password: '' });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -64,7 +64,7 @@ export default function LoginPage() {
                 </div>
             </div>
 
-            <div className="login-formside">
+            <div className="login-form-side">
                 <div className="login-box animate-in">
                     <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
                         <div style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '.25rem' }}>Welcome Back</div>
@@ -102,7 +102,6 @@ export default function LoginPage() {
                             {[
                                 { label: '🌾 Farmer', user: 'farmer_ramesh' },
                                 { label: '🏪 Retailer A', user: 'retailer_a' },
-                                { label: '🚨 Retailer B', user: 'retailer_b' },
                                 { label: '🚨 Retailer B', user: 'retailer_b' },
                                 { label: '🛡️ Admin', user: 'admin' },
                             ].map(c => (

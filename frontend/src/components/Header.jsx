@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const roleIcon = { admin: <Shield size={14} />, retailer: <Store size={14} />, farmer: <User size={14} /> };
-const rolecolor = { admin: '#dc2626', retailer: '#2563eb', farmer: '#16a34a' };
+const roleColor = { admin: '#dc2626', retailer: '#2563eb', farmer: '#16a34a' };
 
 export default function Header() {
     const { user, logout } = useAuth();
@@ -20,7 +20,7 @@ export default function Header() {
                 <Link to="/public" className="btn btn-ghost btn-sm"><Globe size={15} /> Public View</Link>
                 <Link to="/audit" className="btn btn-ghost btn-sm"><Shield size={15} /> Blockchain Audit</Link>
             </nav>
-            <div>
+            <div className="header-user">
                 {user ? (
                     <>
                         <div className="user-badge" style={{ color: roleColor[user.role] }}>

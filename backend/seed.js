@@ -15,7 +15,7 @@ const retailerUsers = [
     { username: 'retailer_e', password: 'demo123', name: 'DAP Supply Hub', location: 'Central Hub, Varanasi', pin_code: '221001', license_number: 'LIC-UP-005', allotted_quantity: 200, current_stock: 198 },
 ];
 
-const extraRetalers = [
+const extraRetailers = [
     { name: 'Kisaan Mitra Bhandar', location: 'North Block, Prayagraj', pin_code: '211001', license_number: 'LIC-UP-006', allotted_quantity: 120, current_stock: 118 },
     { name: 'Bharat Agro Center', location: 'Meerut Road, Ghaziabad', pin_code: '201001', license_number: 'LIC-UP-007', allotted_quantity: 90, current_stock: 85 },
     { name: 'Annadata Fertilizers', location: 'Main Bazar, Gorakhpur', pin_code: '273001', license_number: 'LIC-UP-008', allotted_quantity: 110, current_stock: 107 },
@@ -78,7 +78,7 @@ const farmerData = [
     { name: 'Sudha Singh', aadhaar: '004122223333', mobile_last4: '0041', land_size_acres: 2, khasra_id: 'KH-1041' },
     { name: 'Ashok Pathak', aadhaar: '004222223333', mobile_last4: '0042', land_size_acres: 5, khasra_id: 'KH-1042' },
     { name: 'Sheela Devi', aadhaar: '004322223333', mobile_last4: '0043', land_size_acres: 3, khasra_id: 'KH-1043' },
-    { name: 'Ravi Shankar', aadhaar: '004322223333', mobile_last4: '0044', land_size_acres: 1, khasra_id: 'KH-1044' },
+    { name: 'Ravi Shankar', aadhaar: '004222223333', mobile_last4: '0044', land_size_acres: 1, khasra_id: 'KH-1044' },
     { name: 'Kiran Bala', aadhaar: '004522223333', mobile_last4: '0045', land_size_acres: 2, khasra_id: 'KH-1045' },
     { name: 'Umesh Chaudhary', aadhaar: '004622223333', mobile_last4: '0046', land_size_acres: 4, khasra_id: 'KH-1046' },
     { name: 'Savita Yadav', aadhaar: '004722223333', mobile_last4: '0047', land_size_acres: 3, khasra_id: 'KH-1047' },
@@ -92,6 +92,8 @@ async function seed() {
 
     await dbRun('DELETE FROM audit_chain');
     await dbRun('DELETE FROM disputes');
+    await dbRun('DELETE FROM declarations');
+    await dbRun('DELETE FROM transactions');
     await dbRun('DELETE FROM farmers');
     await dbRun('DELETE FROM retailers');
     await dbRun('DELETE FROM users');
@@ -121,7 +123,7 @@ async function seed() {
 
     console.log('✅ 20 Retailers created');
 
-    const farmerId = [];
+    const farmerIds = [];
     for (const f of farmerData) {
         let userId = null;
         if (f.username) {
@@ -130,7 +132,7 @@ async function seed() {
             userId = userRes.lastID;
         }
         const fRes = await dbRun(
-            'INSERT INTO FARMERS (user_id, name, aadhaar_hash, mobile_last4, land_size_acres, khasra_id) VALUES (?,?,?,?,?,?)',
+            'INSERT INTO farmers (user_id, name, aadhaar_hash, mobile_last4, land_size_acres, khasra_id) VALUES (?,?,?,?,?,?)',
             [userId, f.name, hashAadhaar(f.aadhaar), f.mobile_last4, f.land_size_acres, f.khasra_id]
         );
         farmerIds.push(fRes.lastID);
