@@ -1,7 +1,7 @@
-useState } from 'react';
+import React, { useState } from 'react';
 import { UserCheck, Sprout, ShoppingBag, Fingerprint } from 'lucide-react';
 
-export default function FarmerPortal(){
+export default function FarmerPortal() {
   const [aadhaar, setAadhaar] = useState('');
   const [farmerData, setFarmerData] = useState(null);
   const [loading, setLoading] = useState(false);
