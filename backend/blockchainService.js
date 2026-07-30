@@ -40,6 +40,6 @@ async function verifyChain() {
       return { valid: false, brokenAtBlock: b.block_index, reason: 'Chain linkage broken' };
     }
   }
-  return { valid: true, totalBlocks: blocks.length };
+  return{ valid: true, totalBlocks: blocks.length };
 }
 module.exports = { appendBlock, verifyChain, sha256, GENESIS_HASH };
