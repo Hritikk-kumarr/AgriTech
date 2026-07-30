@@ -10,9 +10,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const JWT_SECRET = Processs.env.jwt_secret || 'dap_portal_jwt_secret_2024';
+const JWT_SECRET = Process.env.JWT_SECRET || 'dap_portal_jwt_secret_2024';
 
-const authenticateJWT = (req, req, next) => {
+const authenticateJWT = (req, res, next) => {
     const auth = req.headers.authorization;
     if (!auth || !auth.startsWith('Bearer ')) return res.status(401).json({ error: 'Unauthorized' });
     try {
@@ -38,7 +38,7 @@ app.post('/api/auth/login', async (req, res) => {
 
         let profileId = null;
         if (user.role === 'retailer') {
-            const role = await dbGet('SELECT id FROM retailers WHERE user_id = ?', [user.id]);
+            const r = await dbGet('SELECT id FROM retailers WHERE user_id = ?', [user.id]);
             profileId = r?.id;
         } else if (user.role === 'farmer') {
             const f = await dbGet('SELECT id FROM farmers WHERE user_id = ?', [user.id]);
@@ -51,16 +51,18 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 app.get('/api/auth/me', authenticateJWT, async (req, res) => {
-    req.json({ id: req.user.id, role: req.user.role, profileId: req.user.profileId, username: req.user.username });
+    res.json({ id: req.user.id, role: req.user.role, profileId: req.user.profileId, username: req.user.username });
 });
 
 app.get('/api/retailers', async (req, res) => {
-    const { pin_code } = req.query;
-    let sql = 'SELECT id, name, location, pin_code, current_stock, allotted_quantity FROM retailers';
-    const params = [];
-    if (pin_code) { sql += ' WHERE pin_code = ?'; params.push(pin_code); }
-    sql += ' ORDER BY name ASC';
-    res.json({ retailers: await dbAll(sql, params) });
+    try {
+        const { pin_code } = req.query;
+        let sql = 'SELECT id, name, location, pin_code, current_stock, allotted_quantity FROM retailers';
+        const params = [];
+        if (pin_code) { sql += ' WHERE pin_code = ?'; params.push(pin_code); }
+        sql += ' ORDER BY name ASC';
+        res.json({ retailers: await dbAll(sql, params) });
+    } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 app.get('/api/retailers/:id/public', async (req, res) => {
@@ -95,11 +97,11 @@ app.get('/api/farmers/me/transactions', authenticateJWT, requireRole('farmer'), 
         const txs = await dbAll(
             `SELECT t.id, t.requested_bags, t.status, t.block_hash, t.timestamp,
               r.name as retailer_name, r.location as retailer_location
-       FROM trnsactions t JOIN retailers r ON t.retailer_id = r.id
+       FROM transactions t JOIN retailers r ON t.retailer_id = r.id
        WHERE t.farmer_id = ? ORDER BY t.timestamp DESC`,
             [req.user.profileId]
         );
-        res.json({ transations: txs });
+        res.json({ transactions: txs });
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
@@ -147,6 +149,16 @@ app.post('/api/transactions/verify', authenticateJWT, requireRole('farmer'), asy
         res.json({ success: true, block_hash: blockHash, message: 'Purchase confirmed and anchored on blockchain.' });
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
+
+app.get('/api/retailers/me', authenticateJWT, requireRole('retailer'), async (req, res) => {
+    try {
+        const r = await dbGet('SELECT * FROM retailers WHERE id = ?', [req.user.profileId]);
+        if (!r) return res.status(404).json({ error: 'Retailer profile not found' });
+        const sold = await dbGet('SELECT SUM(requested_bags) as total FROM transactions WHERE retailer_id = ? AND status = ?', [r.id, 'VERIFIED']);
+        res.json({ retailer: r, total_sold: sold?.total || 0 });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 
 app.get('/api/retailers/me/transactions', authenticateJWT, requireRole('retailer'), async (req, res) => {
     try {
@@ -224,7 +236,7 @@ app.get('/api/admin/flags', authenticateJWT, requireRole('admin'), async (req, r
 
 app.get('/api/admin/stats', authenticateJWT, requireRole('admin'), async (req, res) => {
     try {
-        const retalers = await dbAll('SELECT id, name, trust_score, allotted_quantity, current_stock, location, pin_code, season FROM retailers ORDER BY trust_score ASC');
+        const retailers = await dbAll('SELECT id, name, trust_score, allotted_quantity, current_stock, location, pin_code, season FROM retailers ORDER BY trust_score ASC');
         res.json({ retailers });
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -294,7 +306,7 @@ app.get('/api/audit/verify', async (req, res) => {
 app.get('/api/audit/block/:hash', async (req, res) => {
     try {
         const block = await dbGet('SELECT * FROM audit_chain WHERE block_hash = ?', [req.params.hash]);
-        if (block) return res.status(404).json({ error: 'Block not found' });
+        if (!block) return res.status(404).json({ error: 'Block not found' });
         res.json({ block: { ...block, event_data: JSON.parse(block.event_data) } });
     } catch (e) { res.status(500).json({ error: e.message }); }
 });
