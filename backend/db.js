@@ -7,7 +7,7 @@ const db = new sqlite3.Database(dbPath);
 db.serialize(() => {
     db.run('PRAGMA foreign_keys = ON');
 
-    db.run(`CREATE TABLE IF NOT EXITS users (
+    db.run(`CREATE TABLE IF NOT EXISTS users (
        id INTEGER PRIMARY KEY AUTOINCREMENT,
        username TEXT NOT NULL UNIQUE,
        password_hash TEXT NOT NULL,
@@ -17,7 +17,7 @@ db.serialize(() => {
 
     db.run(`CREATE TABLE IF NOT EXISTS retailers (
        id INTEGER PRIMARY KEY AUTOINCREMENT,
-       user_id INTTEGER REFERENCES users(id),
+       user_id INTEGER REFERENCES users(id),
        name TEXT NOT NULL,
        location TEXT NOT NULL,
        pin_code TEXT NOT NULL,
