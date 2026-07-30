@@ -1,45 +1,37 @@
-import { useState, useEffect } from 'react';
-import { Shield, CheckCircle, XCircle, Search } from 'lucide-react';
+import {useState,useEffect} from 'react';
+import {Shield,CheckCircle,XCircle,Search} from 'lucide-react';
 import Header from '../components/Header';
-import { api } from '../api';
-
+import {api} from '../api';
 export default function BlockchainAuditPage(){
-  const [chain, setChain] = useState([]);
-  const [verifyResult, setVerifyResult] = useState(null);
-  const [lookup, setLookup] = useState('');
-  const [lookupResult, setLookupResult] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(()=> { api('/audit/chain').then(d=>setChain(d.chain||[])).catch(()=>{}); }, []);
-
-  const verify = async () => {
+  const [chain,setChain]=useState([]);
+  const [verifyResult,setVerifyResult]=useState(null);
+  const [lookup,setLookup]=useState('');
+  const [lookupResult,setLookupResult]=useState(null);
+  const [loading,setLoading]=useState(false);
+  useEffect(()=>{api('/audit/chain').then(d=>setChain(d.chain||[])).catch(()=>{});},[]);
+  const verify=async()=>{
     setLoading(true);
-    try { setVerifyResult(await api('/audit/verify')); } catch(e) { console.error(e); }
+    try{setVerifyResult(await api('/audit/verify'));}catch(e){console.error(e);}
     setLoading(false);
   };
-
-  const lookupHash = async e => {
+  const lookupHash=async e=>{
     e.preventDefault(); setLoading(true); setLookupResult(null);
-    try { setLookupResult(await api(`/audit/block/${lookup}`)); }
-    catch(err) { setLookupResult({ error: err.message }); }
+    try {setLookupResult(await api(`/audit/block/${lookup}`));}
+    catch(err){setLookupResult({error: err.message});}
     setLoading(false);
   };
-
-  const eventColor = { TRANSACTION_VERIFIED:'var(--g600)', DECLARATION_SUBMITTED:'var(--blue)' };
-
-  return (
+  const eventColor={TRANSACTION_VERIFIED:'var(--g600)',DECLARATION_SUBMITTED:'var(--blue)'};
+  return(
     <div className="page">
       <Header/>
-      <div style={{ background:'linear-gradient(135deg, #1e1b4b, #312e81)', color:'white', padding:'3rem 1.5rem', textAlign:'center' }}>
-        <Shield size={40} style={{ margin:'0 auto 1rem' }}/>
-        <h1 style={{ fontSize:'2rem', fontWeight:800, marginBottom:'.5rem' }}>Blockchain Audit Trail</h1>
-        <p style={{ opacity:.8, maxWidth:560, margin:'0 auto' }}>
+      <div style={{background:'linear-gradient(135deg,#1e1b4b,#312e81)',color:'white',padding:'3rem 1.5rem',textAlign:'center'}}>
+        <Shield size={40}style={{margin:'0 auto 1rem'}}/>
+        <h1 style={{fontSize:'2rem',fontWeight:800,marginBottom:'.5rem'}}>Blockchain Audit Trail</h1>
+        <p style={{opacity:.8,maxWidth:560,margin:'0 auto'}}>
           Every transaction and declaration is permanently anchored as a tamper-proof block. No one — not even the system administrators — can alter these records.
         </p>
       </div>
-
       <main className="main">
-        {/* Privacy Model Card */}
         <div className="card" style={{ marginBottom:'2rem', borderLeft:'4px solid #6366f1', background:'#f5f3ff' }}>
           <div className="card-body">
             <div style={{ fontWeight:700, color:'#4338ca', marginBottom:'.75rem', fontSize:'1rem' }}>🔐 Privacy Architecture</div>
@@ -58,9 +50,7 @@ export default function BlockchainAuditPage(){
             </div>
           </div>
         </div>
-
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1.5rem', marginBottom:'2rem' }}>
-          {/* Chain Integrity Verifier */}
           <div className="card">
             <div className="card-header"><h3>⛓ Verify Chain Integrity</h3></div>
             <div className="card-body">
@@ -79,8 +69,6 @@ export default function BlockchainAuditPage(){
               )}
             </div>
           </div>
-
-          {/* Hash Lookup */}
           <div className="card">
             <div className="card-header"><h3>🔍 Look Up a Block</h3></div>
             <div className="card-body">
@@ -108,8 +96,6 @@ export default function BlockchainAuditPage(){
             </div>
           </div>
         </div>
-
-        {/* Full Chain */}
         <div className="card">
           <div className="card-header">
             <h3>📦 Full Audit Chain ({chain.length} blocks)</h3>
