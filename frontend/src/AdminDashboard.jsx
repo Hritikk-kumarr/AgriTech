@@ -11,8 +11,6 @@ export default function AdminDashboard(){
   const [disputes, setDisputes] = useState([]);
   const [summary, setSummary] = useState(null);
   const [txs, setTxs] = useState([]);
-  const [prevFlagCount, setPrevFlagCount] = useState(0);
-  const [newAlert, setNewAlert] = useState(false);
 
   const load = async () => {
     try {
