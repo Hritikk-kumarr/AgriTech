@@ -10,7 +10,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const JWT_SECRET = Process.env.JWT_SECRET || 'dap_portal_jwt_secret_2024';
+const JWT_SECRET = process.env.JWT_SECRET || 'dap_portal_jwt_secret_2024';
 
 const authenticateJWT = (req, res, next) => {
     const auth = req.headers.authorization;
