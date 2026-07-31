@@ -5,7 +5,7 @@ import PublicPortal from './pages/PublicPortal';
 import FarmerDashboard from './pages/FarmerDashboard';
 import RetailerDashboard from './pages/RetailerDashboard';
 import AdminDashboard from './pages/AdminDashboard';
-
+import BlockchainAuditPage from './pages/BlockchainAuditPage';
 
 const ProtectedRoute = ({ children, role }) => {
     const { user } = useAuth();
