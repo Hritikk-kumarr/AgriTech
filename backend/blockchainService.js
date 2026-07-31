@@ -39,7 +39,7 @@ async function verifyChain() {
     if (expectedDataHash !== b.data_hash) {
       return { valid: false, brokenAtBlock: b.block_index, reason: 'Data hash mismatch' };
     }
-    // Verify block_hash
+    
     const expectedBlockHash = sha256(b.prev_hash + b.event_type + b.data_hash + b.timestamp);
     if (expectedBlockHash !== b.block_hash) {
       return { valid: false, brokenAtBlock: b.block_index, reason: 'Block hash mismatch' };
